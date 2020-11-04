@@ -5,25 +5,41 @@ import {Animal} from '../../shared/domain/animal';
   selector: 'app-animal-form',
   template: `
     <mat-card *ngIf="animal">
-      <form (submit)="submitEvent.emit(animal)">
+      <mat-card-header>
+        <mat-card-title><ng-content></ng-content></mat-card-title>
+      </mat-card-header>
+      <form #animalForm="ngForm"  (ngSubmit)="submitEvent.emit(animal)">
         <mat-card-content>
-          <input placeholder="Name" name="name" [(ngModel)]="animal.name"><br>
-          <select [(ngModel)]="animal.species" name="species">
-            <option value="Horse">Horse</option>
-            <option value="Dog">Dog</option>
-            <option value="Cat">Cat</option>
-          </select><br>
-          <input placeholder="Comment" name="species" [(ngModel)]="animal.comment">
+          <mat-form-field hintLabel="Max 24 characters" appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput id="name" name="name" [(ngModel)]="animal.name" required maxlength="24">
+            <mat-hint *ngIf="animalForm.form.touched && !animal.name" class="text-danger mx-1"> You must enter a name</mat-hint>
+            <mat-hint align="end">{{ animal.name?.length || 0}}/24</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Species</mat-label>
+            <mat-select [(ngModel)]="animal.species" name="species">
+              <mat-option value="Horse">Horse</mat-option>
+              <mat-option value="Dog">Dog</mat-option>
+              <mat-option value="Cat">Cat</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field hintLabel="Max 512 characters" appearance="outline">
+            <mat-label>Comment</mat-label>
+            <textarea matInput name="comment" [(ngModel)]="animal.comment" maxlength="512"></textarea>
+            <mat-hint align="end">{{ animal.comment?.length || 0}}/512</mat-hint>
+          </mat-form-field>
         </mat-card-content>
         <mat-card-actions align="end">
-          <button mat-mini-fab color="primary" type="submit">
-            <mat-icon>add</mat-icon>
+          <button [disabled]="!animalForm.form.valid" mat-mini-fab color="primary" type="submit">
+            <mat-icon>done</mat-icon>
           </button>
         </mat-card-actions>
       </form>
     </mat-card>
   `,
   styles: [
+    'mat-form-field { width: 100% }'
   ]
 })
 export class AnimalFormComponent implements OnInit {

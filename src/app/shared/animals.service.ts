@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Animal} from './domain/animal';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,12 @@ export class AnimalsService {
   }
 
   create(animal: Animal): void {
-    this.http.post(environment.api + 'animals/', animal);
+    this.http.post(environment.api + 'animals/', animal)
+      .subscribe({
+        next: value => {
+          console.log(value);
+        }
+      });
   }
 
   readAll(callback: (animals: Animal[]) => void): void {
@@ -22,8 +28,16 @@ export class AnimalsService {
       });
   }
 
-  update(animal: Animal): void {
-    this.http.put(environment.api + 'animals/' + animal.id, animal);
+  readById(id: number, callback: (animal: Animal) => void): void {
+    this.http.get<Animal>(environment.api + 'animals/' + id)
+      .subscribe({
+        next: callback
+      });
+  }
+
+  // tslint:disable-next-line:no-any
+  update(animal: Animal): Observable<any> {
+    return this.http.put(environment.api + 'animals/' + animal.id, animal);
   }
 
   destroy(id: number): void {
