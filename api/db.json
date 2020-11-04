@@ -1,0 +1,32 @@
+{
+  "animals": [
+    {
+      "id": 0,
+      "name": "Bojack Horseman",
+      "species": "Horse",
+      "veterinarian": 0,
+      "comment": "1234567890"
+    },
+    {
+      "id": 1,
+      "name": "Princess Carolyn",
+      "species": "Cat",
+      "veterinarian": 0,
+      "comment": "ok"
+    },
+    {
+      "id": 2,
+      "name": "Mr Peanutbutter",
+      "species": "Dog",
+      "veterinarian": 0,
+      "comment": "ok"
+    }
+  ],
+  "veterinarians": [
+    {
+      "id": 0,
+      "firstname": "Diane",
+      "lastname": "Nguyen"
+    }
+  ]
+}
