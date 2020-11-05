@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Animal} from '../../shared/domain/animal';
 import {AnimalsService} from '../../shared/animals.service';
-import {ActivatedRoute, ParamMap} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 
 @Component({
   selector: 'app-animal-edit',
@@ -13,32 +13,20 @@ import {ActivatedRoute, ParamMap} from '@angular/router';
 })
 export class AnimalEditComponent implements OnInit {
   animal: Animal | undefined;
-  id: number;
-  @Output() refreshEvent = new EventEmitter();
 
-  constructor(private animalService: AnimalsService, private activatedRoute: ActivatedRoute) {this.id = -1; }
+  constructor(private animalService: AnimalsService, private activatedRoute: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
-      if ( params.get('id') ){
-        // @ts-ignore
-        this.id = +params.get('id');
-        this.refresh();
-      }
+    this.activatedRoute.data.subscribe(data => {
+      this.animal = data.animal;
     });
   }
 
   updateAnimal(animal: Animal): void {
-    this.animalService.update(animal).subscribe({
-      next: () => this.refresh()
+    this.animalService.update(animal, animal.id).subscribe({
+      next: () => {
+        this.router.navigateByUrl('animals').then(r => this.animalService.dataChanged.next('updated'));
+      }
     });
-  }
-
-  refresh(): void {
-    this.animalService.readById(
-      this.id,
-      animal => this.animal = animal
-    );
-    this.refreshEvent.emit();
   }
 }

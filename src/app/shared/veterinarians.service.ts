@@ -3,49 +3,15 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Veterinarian} from './domain/veterinarian';
 import {Observable} from 'rxjs';
+import {CrudService} from './crud.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class VeterinariansService {
+export class VeterinariansService extends CrudService<Veterinarian>{
 
-  constructor(private http: HttpClient) {
+  constructor(http: HttpClient) {
+    super(http, 'veterinarians/');
   }
 
-  create(vet: Veterinarian): void {
-    this.http.post(environment.api + 'veterinarians/', vet)
-      .subscribe({
-        next: value => {
-          console.log(value);
-        }
-      });
-  }
-
-  readAll(callback: (vets: Veterinarian[]) => void): void {
-    this.http.get<Veterinarian[]>(environment.api + 'veterinarians/')
-      .subscribe({
-        next: callback
-      });
-  }
-
-  readById(id: number, callback: (vet: Veterinarian) => void): void {
-    this.http.get<Veterinarian>(environment.api + 'veterinarians/' + id)
-      .subscribe({
-        next: callback
-      });
-  }
-
-  // tslint:disable-next-line:no-any
-  update(vet: Veterinarian): Observable<any> {
-    return this.http.put(environment.api + 'veterinarians/' + vet.id, vet);
-  }
-
-  destroy(id: number): void {
-    this.http.delete(environment.api + 'veterinarians/' + id)
-      .subscribe({
-        next: value => {
-          console.log(value);
-        }
-      });
-  }
 }

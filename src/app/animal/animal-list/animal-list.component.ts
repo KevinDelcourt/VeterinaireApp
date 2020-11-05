@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {AnimalsService} from '../../shared/animals.service';
 import {Animal} from '../../shared/domain/animal';
 import {Species} from '../../shared/domain/species.enum';
-import {ActivatedRoute, ParamMap} from '@angular/router';
 
 @Component({
   selector: 'app-animals-list',
@@ -17,36 +16,40 @@ import {ActivatedRoute, ParamMap} from '@angular/router';
     </div>
   `,
   styles: [
-    ''
   ]
 })
 export class AnimalListComponent implements OnInit {
   animals: Animal[];
   newAnimal: Animal;
 
-  constructor(private animalService: AnimalsService, private activatedRoute: ActivatedRoute) {
+  constructor(private animalService: AnimalsService) {
     this.animals = [];
     this.newAnimal = {comment: '', id: 0, name: '', species: Species.Horse, veterinarian: 0};
   }
 
   ngOnInit(): void {
-    this.updateList();
+    this.animalService.readAll().subscribe({
+      next: animals => this.animals = animals
+    });
+    this.animalService.dataChanged.subscribe({
+      next: () => this.animalService.readAll().subscribe({
+        next: animals => this.animals = animals
+      })
+    });
   }
 
   deleteAnimal(animal: Animal): void {
-    this.animalService.destroy(animal.id);
-    this.updateList();
+    this.animalService.destroy(animal.id).subscribe(() => this.animalService.dataChanged.next('deleted'));
   }
 
   createAnimal(animal: Animal): void {
-    this.animalService.create(animal);
-    this.newAnimal = {comment: '', id: 0, name: '', species: Species.Horse, veterinarian: 0};
-    this.updateList();
+    this.animalService.create(animal).subscribe({
+      next: () => {
+        this.newAnimal = {comment: '', id: 0, name: '', species: Species.Horse, veterinarian: 0};
+        this.animalService.dataChanged.next('created');
+      }
+    });
+
   }
 
-  updateList(): void {
-    this.animalService.readAll((animals: Animal[]) => {
-      this.animals = animals;
-    });
-  }
 }

@@ -1,7 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Animal} from '../../shared/domain/animal';
-import {AnimalsService} from '../../shared/animals.service';
 import {ActivatedRoute, ParamMap} from '@angular/router';
+import {VeterinariansService} from '../../shared/veterinarians.service';
+import {Veterinarian} from '../../shared/domain/veterinarian';
 
 @Component({
   selector: 'app-animal-details',
@@ -20,6 +21,9 @@ import {ActivatedRoute, ParamMap} from '@angular/router';
         <div>
           Comment : {{ animal.comment }}
         </div>
+        <div *ngIf="vet">
+          Veterinarian : <button mat-button color="accent" [routerLink]="['/veterinarians','view',vet.id]">{{ vet.firstname }} {{ vet.lastname }}</button>
+        </div>
       </mat-card-content>
     </mat-card>
   `,
@@ -29,18 +33,14 @@ import {ActivatedRoute, ParamMap} from '@angular/router';
 })
 export class AnimalDetailsComponent implements OnInit {
   animal: Animal | undefined;
+  vet: Veterinarian | undefined;
 
-  constructor(private animalService: AnimalsService, private activatedRoute: ActivatedRoute) {}
+  constructor(private activatedRoute: ActivatedRoute, private veterinariansService: VeterinariansService) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
-      if ( params.get('id') ){
-        this.animalService.readById(
-          // @ts-ignore
-          +params.get('id'),
-          animal => this.animal = animal
-        );
-      }
+    this.activatedRoute.data.subscribe(data => {
+      this.animal = data.animal;
+      this.veterinariansService.readById(this.animal?.veterinarian as number).subscribe(vet => this.vet = vet);
     });
   }
 

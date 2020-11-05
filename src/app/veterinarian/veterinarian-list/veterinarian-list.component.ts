@@ -27,21 +27,26 @@ export class VeterinarianListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.updateList();
-  }
-
-  updateList(): void {
-    this.veterinariansService.readAll(vets => this.veterinarians = vets);
+    this.veterinariansService.readAll().subscribe({
+      next: vets => this.veterinarians = vets
+    });
+    this.veterinariansService.dataChanged.subscribe({
+      next: () => this.veterinariansService.readAll().subscribe({
+        next: vets => this.veterinarians = vets
+      })
+    });
   }
 
   createVeterinarian(vet: Veterinarian): void {
-    this.veterinariansService.create(vet);
-    this.newVet = {firstname: '', id: 0, lastname: ''};
-    this.updateList();
+    this.veterinariansService.create(vet).subscribe({
+      next: () => {
+        this.newVet = {firstname: '', id: 0, lastname: ''};
+        this.veterinariansService.dataChanged.next('updated');
+      }
+    });
   }
 
   deleteVeterinarian(vet: Veterinarian): void {
-    this.veterinariansService.destroy(vet.id);
-    this.updateList();
+    this.veterinariansService.destroy(vet.id).subscribe(() => this.veterinariansService.dataChanged.next('created'));
   }
 }

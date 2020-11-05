@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {Veterinarian} from '../../shared/domain/veterinarian';
 import {VeterinariansService} from '../../shared/veterinarians.service';
 import {ActivatedRoute, ParamMap} from '@angular/router';
+import {Animal} from '../../shared/domain/animal';
+import {AnimalsService} from '../../shared/animals.service';
 
 @Component({
   selector: 'app-veterinarian-details',
@@ -20,6 +22,9 @@ import {ActivatedRoute, ParamMap} from '@angular/router';
         <div>
           Last Name : {{ vet.lastname }}
         </div>
+        <div>
+          Animals : <button *ngFor="let animal of animals" mat-button color="accent" [routerLink]="['/animals','view',animal.id]">{{ animal.name }}</button>
+        </div>
       </mat-card-content>
     </mat-card>
   `,
@@ -29,17 +34,18 @@ import {ActivatedRoute, ParamMap} from '@angular/router';
 })
 export class VeterinarianDetailsComponent implements OnInit {
   vet: Veterinarian | undefined;
+  animals: Animal[];
 
-  constructor(private veterinarianService: VeterinariansService, private activatedRoute: ActivatedRoute) {}
+  constructor(private activatedRoute: ActivatedRoute, private animalsService: AnimalsService) {
+    this.animals = [];
+  }
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
-      if ( params.get('id') ){
-        this.veterinarianService.readById(
-          // @ts-ignore
-          +params.get('id'),
-          veterinarian => this.vet = veterinarian
-        );
+    this.activatedRoute.data.subscribe(data => {
+      this.vet = data.veterinarian;
+      if (this.vet) {
+        // @ts-ignore
+        this.animalsService.readAll().subscribe(animals => this.animals = animals.filter(a => a.veterinarian === this.vet.id));
       }
     });
   }

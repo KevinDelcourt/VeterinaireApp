@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {Veterinarian} from '../../shared/domain/veterinarian';
 import {VeterinariansService} from '../../shared/veterinarians.service';
-import {ActivatedRoute, ParamMap} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router, RouterModule} from '@angular/router';
 
 @Component({
   selector: 'app-veterinarian-edit',
@@ -13,33 +13,20 @@ import {ActivatedRoute, ParamMap} from '@angular/router';
 })
 export class VeterinarianEditComponent implements OnInit {
   vet: Veterinarian | undefined;
-  id: number;
 
-  constructor(private veterinarianService: VeterinariansService, private activatedRoute: ActivatedRoute) {this.id = -1; }
+  constructor(private veterinarianService: VeterinariansService, private activatedRoute: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
-      if ( params.get('id') ){
-        // @ts-ignore
-        this.id = +params.get('id');
-        this.refresh();
-      }
+    this.activatedRoute.data.subscribe(data => {
+      this.vet = data.veterinarian;
     });
   }
 
   updateVet(veterinarian: Veterinarian): void{
     if (this.vet) {
-      veterinarian.id = this.vet.id;
-      this.veterinarianService.update(veterinarian).subscribe({
-        next: () => this.refresh()
+      this.veterinarianService.update(veterinarian, this.vet.id).subscribe({
+        next: () => this.router.navigateByUrl('veterinarians').then(() => this.veterinarianService.dataChanged.next('updated'))
       });
     }
-  }
-
-  refresh(): void {
-    this.veterinarianService.readById(
-      this.id,
-      veterinarian => this.vet = veterinarian
-    );
   }
 }

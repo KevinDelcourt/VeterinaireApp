@@ -14,12 +14,12 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
           <mat-form-field appearance="outline">
             <mat-label>First Name</mat-label>
             <input matInput formControlName="firstname">
-            <mat-hint class="text-danger" *ngIf="vetForm.get('firstname').dirty && ( vetForm.get('firstname').errors?.required || vetForm.get('firstname').value.length > 24 )">Names must be between 1 and 24 characters</mat-hint>
+            <mat-hint class="text-danger" *ngIf="vetForm.get('firstname')?.dirty && ( vetForm.get('firstname')?.errors?.required || vetForm.get('firstname')?.value.length > 24 )">Names must be between 1 and 24 characters</mat-hint>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Last Name</mat-label>
             <input matInput formControlName="lastname">
-            <mat-hint class="text-danger" *ngIf="vetForm.get('lastname').dirty && ( vetForm.get('lastname').errors?.required || vetForm.get('lastname').value.length > 24 )">Names must be between 1 and 24 characters</mat-hint>
+            <mat-hint class="text-danger" *ngIf="vetForm.get('lastname')?.dirty && ( vetForm.get('lastname')?.errors?.required || vetForm.get('lastname')?.value.length > 24 )">Names must be between 1 and 24 characters</mat-hint>
           </mat-form-field>
         </mat-card-content>
         <mat-card-actions align="end">
